@@ -1,6 +1,7 @@
 document.getElementById('extractBtn').addEventListener('click', async () => {
   const status = document.getElementById('status');
   status.textContent = '正在提取...';
+  status.className = 'info';
 
   try {
     // 获取当前活动标签页
@@ -17,14 +18,17 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
     const jsonString = results[0]?.result;
     if (!jsonString) {
       status.textContent = '未发现成绩表，请确认页面中包含表格数据。';
+      status.className = 'info';
       return;
     }
 
     // 触发浏览器下载 JSON 文件
-    downloadJSON(jsonString, '成绩表.json');
+    downloadJSON(jsonString, '成绩表_'+new Date().toLocaleString('en-US') +'.json');
     status.textContent = '提取成功，文件已下载。';
+    status.className = 'success';
   } catch (err) {
     status.textContent = '提取失败：' + err.message;
+    status.className = 'error';
     console.error(err);
   }
 });
@@ -34,7 +38,18 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
  */
 function extractGradeTableAsJSON() {
   // ---------- 1. 获取所有表格 ----------
-  const tables = document.querySelectorAll('table');
+  let tables = document.querySelectorAll('table');
+  const iframes = document.querySelectorAll('iframe');
+  for (const iframe of iframes) {
+    try {
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const iframeTables = iframeDoc.querySelectorAll('table');
+      tables = [...tables, ...iframeTables];
+    } catch (e) {
+      // 无法访问跨域 iframe，忽略
+    } 
+  }
+
   if (!tables.length) return null;
 
   // ---------- 2. 定义表头关键词（中英文） ----------
@@ -42,8 +57,8 @@ function extractGradeTableAsJSON() {
     '学号', '姓名', '学生', '成绩', '分数', '课程', '科目',
     '语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治',
     '总分', '平均', '排名', '绩点', '等级',
-    'id', 'name', 'student', 'grade', 'score', 'subject', 'course',
-    'total', 'average', 'rank', 'gpa', 'level'
+    'id', 'name', 'student', 'grade', 'score', 'subject', 'course','contact','email',
+    'total', 'average', 'rank', 'gpa', 'level','描述','Company','公司'
   ];
   const keywordRegex = new RegExp(gradeKeywords.join('|'), 'i');
 
