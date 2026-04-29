@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "tablecapture",
   "version": "0.1.0",
   "description": "自动识别网页中的成绩表，并导出为 JSON 文件",
