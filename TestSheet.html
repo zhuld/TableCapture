@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>智慧校园 | 学生成绩综合看板</title>
+    <!-- 引入 Google Font 提升现代感 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (免费图标库) 用于辅助视觉 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #f1f5f9;
+            padding: 2rem 1.5rem;
+            color: #0f172a;
+        }
+
+        /* 主容器卡片效果 */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* 头部区域 */
+        .header-section {
+            padding: 1.75rem 2rem 1rem 2rem;
+            border-bottom: 1px solid #e9eef3;
+            background: #ffffff;
+        }
+
+        .title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b, #2d3a4f);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .title p {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 0.3rem;
+            font-weight: 500;
+        }
+
+        .stats-badge {
+            background: #eef2ff;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e40af;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 工具栏：搜索 + 每页显示 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 60px;
+            padding: 0.4rem 0.8rem 0.4rem 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .search-box:focus-within {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+            background: white;
+        }
+        .search-box i {
+            color: #7f8ea3;
+            font-size: 0.9rem;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 0.5rem 0.7rem;
+            font-size: 0.9rem;
+            width: 240px;
+            outline: none;
+            font-weight: 500;
+            color: #0f172a;
+        }
+        .search-box input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .page-size-selector select {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: 0.1s;
+            font-family: inherit;
+        }
+        .page-size-selector select:focus {
+            border-color: #3b82f6;
+        }
+
+        /* 表格容器 - 支持横向滚动 */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 0 0 0.5rem 0;
+            scroll-behavior: smooth;
+        }
+
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 800px;
+        }
+
+        .grade-table th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 1rem 1rem;
+            border-bottom: 1.5px solid #e2e8f0;
+            text-align: left;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+
+        .grade-table td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid #edf2f7;
+            color: #1f2a44;
+            vertical-align: middle;
+        }
+
+        .grade-table tbody tr:hover {
+            background-color: #fefce8;
+            transition: 0.1s ease;
+        }
+
+        /* 斑马纹使数据清晰 */
+        .grade-table tbody tr:nth-child(even) {
+            background-color: #fefefe;
+        }
+        .grade-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        /* 等级标签风格 */
+        .grade-badge {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-align: center;
+            min-width: 48px;
+            letter-spacing: 0.3px;
+        }
+        .grade-A { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .grade-B { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .grade-C { background: #fed7aa; color: #9a3412; border: 1px solid #fed7aa; }
+        .grade-D { background: #ffedd5; color: #b45309; border: 1px solid #fed7aa; }
+        .grade-F { background: #ffe4e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        .score-cell {
+            font-weight: 600;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        /* 分页组件 */
+        .pagination-section {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem 1.8rem 2rem;
+            background: #ffffff;
+            border-top: 1px solid #ecf3fa;
+            gap: 1rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 0.4rem 1rem;
+            border-radius: 34px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e293b;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background: #e6edf4;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .page-info {
+            font-size: 0.85rem;
+            background: #f8fafc;
+            padding: 0.3rem 1rem;
+            border-radius: 34px;
+            font-weight: 500;
+            color: #2c3e66;
+        }
+        .jump-input {
+            width: 65px;
+            padding: 0.35rem 0.5rem;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+            outline: none;
+        }
+        .jump-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.35rem 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.75rem;
+            transition: 0.1s;
+        }
+        .data-range {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            background: #f1f5f9;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem;
+            }
+            .header-section {
+                padding: 1.25rem 1rem;
+            }
+            .pagination-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box input {
+                width: 100%;
+            }
+        }
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <div class="header-section">
+        <div class="title-wrapper">
+            <div class="title">
+                <h1><i class="fas fa-chalkboard-user" style="margin-right: 10px; color:#3b82f6;"></i>学业档案 · 成绩明细表</h1>
+                <p>学号 | 学校 | 班级 | 学生 | 考试名称 | 成绩 | 等级</p>
+            </div>
+            <div class="stats-badge">
+                <i class="fas fa-database"></i> 总数据 <span id="totalCountSpan">100</span> 条
+            </div>
+        </div>
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="学号 / 姓名 / 学校 / 考试..." autocomplete="off">
+            </div>
+            <div class="page-size-selector">
+                <span><i class="fas fa-table-list"></i> 每页显示</span>
+                <select id="pageSizeSelect">
+                    <option value="10">10条</option>
+                    <option value="20" selected>20条</option>
+                    <option value="50">50条</option>
+                    <option value="100">100条</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="grade-table" id="dataTable">
+            <thead>
+                <tr>
+                    <th>学号</th><th>学校</th><th>班级</th><th>学生名字</th><th>考试名称</th><th>成绩</th><th>等级</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="7" class="no-data">加载数据中...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-section">
+        <div class="data-range" id="rangeInfo">展示 0 - 0 条 (共0条)</div>
+        <div class="pagination-controls">
+            <button class="pagination-btn" id="prevPageBtn" disabled><i class="fas fa-chevron-left"></i> 上一页</button>
+            <div class="page-info" id="pageInfo">第 1 / 1 页</div>
+            <button class="pagination-btn" id="nextPageBtn" disabled>下一页 <i class="fas fa-chevron-right"></i></button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.75rem;">跳转</span>
+                <input type="number" id="jumpPageInput" class="jump-input" min="1" value="1">
+                <button id="jumpBtn" class="jump-btn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ----------------------------- 生成模拟数据 共100行 ---------------------------------
+    // 配置数据池
+    const SCHOOLS = ["第一中学", "第二中学", "实验中学", "外国语学校", "育才中学", "第七中学", "朝阳中学"];
+    const EXAM_NAMES = ["期中考试", "期末考试", "第一次月考", "第二次月考", "模拟测试", "单元质量检测", "学业水平测试"];
+    const LAST_NAMES = ["张", "王", "李", "刘", "陈", "杨", "赵", "周", "吴", "郑", "林", "郭", "唐", "孙", "沈", "宋", "黄", "何"];
+    const GIVEN_NAMES = ["一诺", "宇轩", "梓涵", "明哲", "雨桐", "欣然", "逸飞", "思琪", "昊然", "若曦", "子轩", "沐晴", "瑾瑜", "星野", "芷柔", "致远", "静瑶", "泽洋", "灵熙", "峻宇"];
+
+    // 辅助函数: 随机整数 [min,max]
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    // 随机班级 1~16班
+    const getRandomClass = () => rand(1, 16) + "班";
+    // 随机成绩 0~100
+    const getRandomScore = () => rand(0, 100);
+    // 根据成绩计算等级
+    const getGrade = (score) => {
+        if (score >= 90) return "A";
+        if (score >= 80) return "B";
+        if (score >= 70) return "C";
+        if (score >= 60) return "D";
+        return "F";
+    };
+    // 生成随机姓名
+    const getRandomName = () => {
+        const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+        const given = GIVEN_NAMES[Math.floor(Math.random() * GIVEN_NAMES.length)];
+        return lastName + given;
+    };
+    // 随机学校
+    const getRandomSchool = () => SCHOOLS[Math.floor(Math.random() * SCHOOLS.length)];
+    // 随机考试名称
+    const getRandomExam = () => EXAM_NAMES[Math.floor(Math.random() * EXAM_NAMES.length)];
+
+    // 生成100条学生成绩记录
+    const generateMockData = (rowsCount = 100) => {
+        const data = [];
+        for (let i = 1; i <= rowsCount; i++) {
+            // 学号格式: 2024 + 四位序号 0001->0100
+            const studentId = `2024${String(i).padStart(4, '0')}`;
+            const school = getRandomSchool();
+            const className = getRandomClass();
+            const studentName = getRandomName();
+            const examName = getRandomExam();
+            const score = getRandomScore();
+            const level = getGrade(score);
+            data.push({
+                id: studentId,
+                school,
+                className,
+                studentName,
+                examName,
+                score,
+                level
+            });
+        }
+        return data;
+    };
+
+    // 全局数据
+    let allData = generateMockData(100);    // 原始100条
+    let filteredData = [...allData];        // 过滤后数据
+    let currentPage = 1;
+    let pageSize = 20;                     // 默认每页20条，与select默认值匹配
+
+    // DOM 元素
+    const tbody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+    const pageSizeSelect = document.getElementById("pageSizeSelect");
+    const prevBtn = document.getElementById("prevPageBtn");
+    const nextBtn = document.getElementById("nextPageBtn");
+    const pageInfoSpan = document.getElementById("pageInfo");
+    const rangeInfoSpan = document.getElementById("rangeInfo");
+    const totalCountSpan = document.getElementById("totalCountSpan");
+    const jumpPageInput = document.getElementById("jumpPageInput");
+    const jumpBtn = document.getElementById("jumpBtn");
+
+    // 更新总数显示
+    const updateTotalCountDisplay = () => {
+        totalCountSpan.innerText = allData.length;
+    };
+
+    // 过滤逻辑 (基于学号、学生名字、学校、班级、考试名称)
+    const filterData = () => {
+        const keyword = searchInput.value.trim().toLowerCase();
+        if (keyword === "") {
+            filteredData = [...allData];
+        } else {
+            filteredData = allData.filter(item => {
+                return item.id.toLowerCase().includes(keyword) ||
+                       item.studentName.toLowerCase().includes(keyword) ||
+                       item.school.toLowerCase().includes(keyword) ||
+                       item.className.toLowerCase().includes(keyword) ||
+                       item.examName.toLowerCase().includes(keyword);
+            });
+        }
+        // 重置当前页码
+        currentPage = 1;
+        // 同步分页组件及渲染
+        renderTableByPage();
+        renderPaginationInfo();
+    };
+
+    // 获取当前页需要展示的数据片段
+    const getCurrentPageData = () => {
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        return filteredData.slice(start, end);
+    };
+
+    // 渲染表格内容
+    const renderTable = () => {
+        const pageData = getCurrentPageData();
+        if (!pageData.length) {
+            tbody.innerHTML = `<tr><td colspan="7" class="no-data"><i class="fas fa-search"></i> 没有匹配的数据，试试其他关键字</td></tr>`;
+            return;
+        }
+        let html = '';
+        for (let row of pageData) {
+            // 等级样式动态绑定
+            let gradeClass = '';
+            if (row.level === 'A') gradeClass = 'grade-A';
+            else if (row.level === 'B') gradeClass = 'grade-B';
+            else if (row.level === 'C') gradeClass = 'grade-C';
+            else if (row.level === 'D') gradeClass = 'grade-D';
+            else gradeClass = 'grade-F';
+            
+            html += `<tr>
+                        <td style="font-weight:500; font-family: monospace;">${row.id}</td>
+                        <td>${row.school}</td>
+                        <td>${row.className}</td>
+                        <td>${row.studentName}</td>
+                        <td>${row.examName}</td>
+                        <td class="score-cell">${row.score}</td>
+                        <td><span class="grade-badge ${gradeClass}">${row.level}</span></td>
+                     </tr>`;
+        }
+        tbody.innerHTML = html;
+    };
+
+    // 更新分页信息（页码，范围，按钮状态）
+    const renderPaginationInfo = () => {
+        const totalFiltered = filteredData.length;
+        const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
+        // 避免越界
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        
+        const startItem = totalFiltered === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+        const endItem = Math.min(currentPage * pageSize, totalFiltered);
+        
+        rangeInfoSpan.innerText = `展示 ${startItem} - ${endItem} 条  (共 ${totalFiltered} 条记录)`;
+        pageInfoSpan.innerText = `第 ${currentPage} / ${totalPages} 页`;
+        
+        // 按钮禁用逻辑
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+        
+        // 跳转输入框最大值设定
+        jumpPageInput.max = totalPages;
+        jumpPageInput.min = 1;
+        jumpPageInput.value = currentPage;
+        
+        // 如果过滤后数据为空，显示提示表格已渲染过空状态，这里确保按钮禁用时样式一致
+        if (totalFiltered === 0) {
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+        }
+    };
+    
+    // 整合渲染表格和分页控件
+    const renderTableByPage = () => {
+        renderTable();
+        renderPaginationInfo();
+    };
+    
+    // 改变每页条目数
+    const changePageSize = () => {
+        pageSize = parseInt(pageSizeSelect.value, 10);
+        currentPage = 1;
+        renderTableByPage();
+    };
+    
+    // 上一页
+    const goPrevPage = () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTableByPage();
+        }
+    };
+    
+    // 下一页
+    const goNextPage = () => {
+        const totalPages = Math.ceil(filteredData.length / pageSize);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTableByPage();
+        }
+    };
+    
+    // 跳转页码
+    const jumpToPage = () => {
+        let targetPage = parseInt(jumpPageInput.value, 10);
+        const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
+        if (isNaN(targetPage)) targetPage = 1;
+        targetPage = Math.min(totalPages, Math.max(1, targetPage));
+        if (targetPage !== currentPage) {
+            currentPage = targetPage;
+            renderTableByPage();
+        } else {
+            // 相同页面，但也要刷新一下输入框数值正确性
+            jumpPageInput.value = currentPage;
+        }
+    };
+    
+    // 重置搜索+重置页码
+    const onSearchInput = () => {
+        filterData();  // 内部重置curPage为1并刷新表格与分页
+    };
+    
+    // 初始渲染 & 事件绑定
+    const init = () => {
+        updateTotalCountDisplay();
+        // 初始过滤数据 = 全量
+        filteredData = [...allData];
+        pageSize = 20;
+        pageSizeSelect.value = "20";
+        currentPage = 1;
+        renderTableByPage();
+        
+        // 监听搜索框
+        searchInput.addEventListener('input', onSearchInput);
+        // 每页条数变化
+        pageSizeSelect.addEventListener('change', changePageSize);
+        // 按钮事件
+        prevBtn.addEventListener('click', goPrevPage);
+        nextBtn.addEventListener('click', goNextPage);
+        jumpBtn.addEventListener('click', jumpToPage);
+        jumpPageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') jumpToPage();
+        });
+    };
+    
+    // 确保100行数据校验（已经生成100条），万一因随机变更，长度就是100，不错
+    // 但为了显示一致性，再确认一下数量
+    if (allData.length !== 100) {
+        // 修补保证100行
+        allData = generateMockData(100);
+        filteredData = [...allData];
+    }
+    updateTotalCountDisplay();
+    
+    // 开始运行
+    init();
+</script>
+</body>
+</html>

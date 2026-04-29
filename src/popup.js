@@ -2,6 +2,7 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
   const status = document.getElementById('status');
   status.textContent = '正在提取...';
   status.className = 'info';
+  const downloadLink = document.getElementById('downloadLink');
 
   try {
     // 获取当前活动标签页
@@ -23,8 +24,14 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
     }
 
     // 触发浏览器下载 JSON 文件
-    downloadJSON(jsonString, '成绩表_'+new Date().toLocaleString('en-US') +'.json');
-    status.textContent = '提取成功，文件已下载。';
+    //downloadJSON(jsonString, '成绩表_'+new Date().toLocaleString('en-US') +'.json');
+
+    // 使用链接方式下载，避免弹窗被拦截
+    downloadLink.href = URL.createObjectURL(new Blob([jsonString], { type: 'application/json' }));
+    downloadLink.download = '成绩表_' + new Date().toLocaleString('en-US') + '.json';
+    downloadLink.textContent = '点击下载成绩表 JSON 文件';
+
+    status.textContent = '提取成功';
     status.className = 'success';
   } catch (err) {
     status.textContent = '提取失败：' + err.message;
