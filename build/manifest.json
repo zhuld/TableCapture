@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "成绩表提取器",
+  "$schema": "https://json.schemastore.org/chrome-manifest.json",
+  "version": "0.2.0",
+  "description": "自动识别网页中的成绩表，并导出为 JSON 文件",
+  "icons": {
+    "128": "icons/icon_128.png",
+    "256": "icons/icon_256.png"
+  },
+  "action": {
+    "default_title": "成绩表提取器",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "icons/icon_128.png",
+      "256": "icons/icon_256.png"
+    }
+  },
+  "permissions": [
+    "activeTab", 
+    "scripting"
+  ],
+  "host_permissions": [
+  "http://*/*"
+  ]
+}
