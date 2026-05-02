@@ -4,6 +4,10 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
   status.className = 'info';
   const downloadLink = document.getElementById('downloadLink');
 
+  // 读取用户选择的格式
+  const formatRadio = document.querySelector('input[name="format"]:checked');
+  const format = formatRadio ? formatRadio.value : 'json';
+
   try {
     // 获取当前活动标签页
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -27,9 +31,16 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
     //downloadJSON(jsonString, '成绩表_'+new Date().toLocaleString('en-US') +'.json');
 
     // 使用链接方式下载，避免弹窗被拦截
-    downloadLink.href = URL.createObjectURL(new Blob([jsonString], { type: 'application/json' }));
-    downloadLink.download = '成绩表_' + new Date().toLocaleString('en-US') + '.json';
-    downloadLink.textContent = '点击下载成绩表 JSON 文件';
+    if (format === 'json') {
+      downloadLink.href = URL.createObjectURL(new Blob([jsonString], { type: 'application/json' }));
+      downloadLink.download = '成绩表_' + new Date().toLocaleString('en-US') + '.json';
+      downloadLink.textContent = '点击下载成绩表 JSON 文件';
+    }else{
+      const txtString = jsonToCsv(jsonString, ','); 
+      downloadLink.href = URL.createObjectURL( new Blob([txtString], { type: 'text/plain;charset=utf-8' }) );
+      downloadLink.download = '成绩表_' + new Date().toLocaleString('en-US') + '.txt';
+      downloadLink.textContent = '点击下载成绩表 TXT 文件';
+    }
 
     status.textContent = '提取成功';
     status.className = 'success';
@@ -42,6 +53,7 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
 
 /**
  * 在页面上下文中执行的函数：识别成绩表并返回 JSON 字符串
+ * @return {string|null} JSON 字符串或 null（未找到成绩表）
  */
 function extractGradeTableAsJSON() {
   // ---------- 1. 获取所有表格 ----------
@@ -168,12 +180,44 @@ function extractGradeTableAsJSON() {
 }
 
 /**
+ * 将 JSON 数组字符串转换为 CSV 字符串
+ * @param {string} jsonString - JSON 数组字符串
+ * @param {string} specialDelimiter - CSV 分隔符（默认为逗号）
+ * @returns {string} CSV 格式的字符串
+ */
+function jsonToCsv(jsonString , specialDelimiter = ',') {
+  const data = JSON.parse(jsonString);
+  if (!data.length) return '';
+
+  const headers = Object.keys(data[0]);
+
+  const escapeCsvField = (field) => {
+    const str = String(field);
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  };
+
+  const csvRows = [];
+  csvRows.push(headers.map(escapeCsvField).join(specialDelimiter));
+
+  for (const row of data) {
+    const values = headers.map(h => escapeCsvField(row[h] ?? ''));
+    csvRows.push(values.join(specialDelimiter));
+  }
+
+  return csvRows.join('\n');
+}
+
+/**
  * 在浏览器中创建一个下载任务
  * @param {string} jsonString - JSON 字符串
  * @param {string} filename - 文件名
+ * @param {string} mimeType - MIME 类型（默认为 application/json）
  */
-function downloadJSON(jsonString, filename) {
-  const blob = new Blob([jsonString], { type: 'application/json' });
+function downloadJSON(jsonString, filename , mimeType = 'application/json'  ) {
+  const blob = new Blob([jsonString], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

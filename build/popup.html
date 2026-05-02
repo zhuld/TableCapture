@@ -42,7 +42,59 @@
       color: #888;
       margin-bottom: 20px;
     }
+    /* ---- 格式选择 ---- */
+    .format-section {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
 
+    .format-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #555;
+      user-select: none;
+    }
+
+    .format-option input[type="radio"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .format-option input[type="radio"]:checked {
+      border-color: #667eea;
+      background: #667eea;
+      box-shadow: inset 0 0 0 3px #ffffffdd;
+    }
+
+    .format-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: white;
+      line-height: 1.4;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-json {
+      background: #f39c12;
+    }
+
+    .badge-txt {
+      background: #27ae60;
+    }
     button {
       width: 100%;
       padding: 12px;
@@ -103,10 +155,21 @@
       <!-- 表格 / 数据提取图标 -->
       <img src="../icons/icon_128.png" alt="成绩表提取器" width="48" height="48"/>
     <h2>成绩表提取器</h2>
-    <p class="subtitle">一键识别并导出JSON格式</p>
+    <p class="subtitle">一键识别成绩单并导出</p>
+        <!-- 格式选择 -->
+    <div class="format-section">
+      <label class="format-option">
+        <input type="radio" name="format" value="json" checked>
+        <span class="format-badge badge-json">JSON</span>
+      </label>
+      <label class="format-option">
+        <input type="radio" name="format" value="txt">
+        <span class="format-badge badge-txt">TXT</span>
+      </label>
+    </div>
     <button id="extractBtn">
       <span class="download-icon"></span>
-      提取成绩表
+      识别成绩表
     </button>
     <div id="status"></div>
     <a  id="downloadLink" ></a>
