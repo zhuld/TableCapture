@@ -7,9 +7,9 @@
 <body>
   <div class="card">
       <!-- 表格 / 数据提取图标 -->
-      <img src="../icons/icon_128.png" alt="成绩表提取器" width="48" height="48"/>
-    <h2>成绩表提取器</h2>
-    <p class="subtitle">一键识别成绩单并导出</p>
+      <!-- <img src="../icons/icon_128.png" alt="成绩表提取器" width="48" height="48"/>
+    <h2>成绩表提取器</h2>-->
+    <h2>一键识别成绩单并导出</h2> 
         <!-- 格式选择 -->
     <div class="format-section">
       <label class="format-option">
@@ -27,6 +27,14 @@
     </button>
     <div id="status"></div>
     <a  id="downloadLink" ></a>
+    <!-- 数据预览区域 -->
+    <div id="previewContainer" class="preview-container">
+      <div class="preview-header">
+        <span>📋 数据预览</span>
+        <span id="previewCount" class="preview-count"></span>
+      </div>
+      <div id="previewContent" class="preview-scroll"></div>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>

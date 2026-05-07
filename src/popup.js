@@ -4,6 +4,10 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
   status.className = 'info';
   const downloadLink = document.getElementById('downloadLink');
 
+  const previewContainer = document.getElementById('previewContainer');
+  const previewContent = document.getElementById('previewContent');
+  const previewCount = document.getElementById('previewCount');
+
   // 读取用户选择的格式
   const formatRadio = document.querySelector('input[name="format"]:checked');
   const format = formatRadio ? formatRadio.value : 'json';
@@ -41,8 +45,13 @@ document.getElementById('extractBtn').addEventListener('click', async () => {
       downloadLink.download = '成绩表_' + new Date().toLocaleString('en-US') + '.txt';
       downloadLink.textContent = '点击下载成绩表 TXT 文件';
     }
+    extractedData = JSON.parse(jsonString);
 
-    status.textContent = '提取成功';
+    // 更新预览
+    renderPreview(extractedData);
+    previewContainer.classList.add('show');
+
+    status.textContent = `提取成功，共 ${extractedData.length} 条数据`;
     status.className = 'success';
   } catch (err) {
     status.textContent = '提取失败：' + err.message;
@@ -177,6 +186,59 @@ function extractGradeTableAsJSON() {
 
   // ---------- 5. 返回 JSON 字符串 ----------
   return JSON.stringify(jsonData, null, 2);
+}
+// ========== 渲染预览 ==========
+function renderPreview(data) {
+  if (!data || !data.length) return;
+
+  // 更新计数
+  previewCount.textContent = `${data.length} 行 · ${Object.keys(data[0]).length} 列`;
+
+  // 构建表格 HTML
+  const headers = Object.keys(data[0]);
+  
+  let html = '<table class="preview-table"><thead><tr>';
+  headers.forEach(h => {
+    html += `<th>${escapeHtml(h)}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // 最多显示 20 行
+  //onst displayRows = data.slice(0, 20);
+  data.forEach(row => {
+    html += '<tr>';
+    headers.forEach(h => {
+      html += `<td title="${escapeHtml(row[h] || '')}">${escapeHtml(row[h] || '')}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  // if (data.length > 20) {
+  //   html += `<tr><td colspan="${headers.length}" style="text-align:center;color:#888;padding:10px;">
+  //     ... 还有 ${data.length - 20} 行数据未显示 ...
+  //   </td></tr>`;
+  //}
+
+  html += '</tbody></table>';
+  previewContent.innerHTML = html;
+}
+
+// 根据格式切换预览样式（JSON 格式显示原始 JSON）
+document.querySelectorAll('input[name="format"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    if (!extractedData) return;
+    if (radio.value === 'json') {
+      previewContent.innerHTML = `<div class="json-preview">${escapeHtml(extractedJsonString)}</div>`;
+    } else {
+      renderPreview(extractedData);
+    }
+  });
+});
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 /**

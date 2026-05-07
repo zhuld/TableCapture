@@ -1,11 +1,11 @@
-   * {
+   *{
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      width: 280px;
+      width: 340px;
       padding: 20px;
       font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -29,7 +29,7 @@
       font-size: 18px;
       font-weight: 600;
       color: #333;
-      margin-bottom: 4px;
+      margin-bottom: 10px;
     }
 
     .subtitle {
@@ -130,6 +130,7 @@
       font-size: 13px;
       color: #1e88e5;
       text-decoration: none;
+      margin-bottom: 12px;
     }
 
     .success {
@@ -142,4 +143,127 @@
 
     .info {
       color: #555;
+    }
+
+    /* ==================== 预览区优化 ==================== */
+    .preview-container {
+      display: none;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #e8ecf1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .preview-container.show {
+      display: block;
+    }
+
+    .preview-header {
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8ecf5 100%);
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a5568;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #dce3ef;
+    }
+
+    .preview-count {
+      font-size: 11px;
+      color: #7b8ba3;
+      font-weight: 500;
+      background: #ffffffaa;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid #dce3ef;
+    }
+
+    .preview-scroll {
+      overflow: auto;
+      max-height: 260px;
+      background: #ffffff;
+    }
+
+    /* 滚动条美化 */
+    .preview-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .preview-scroll::-webkit-scrollbar-track {
+      background: #f7f8fa;
+      border-radius: 3px;
+    }
+
+    .preview-scroll::-webkit-scrollbar-thumb {
+      background: #c4cdd5;
+      border-radius: 3px;
+    }
+
+    .preview-scroll::-webkit-scrollbar-thumb:hover {
+      background: #a0aab5;
+    }
+
+    table.preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    table.preview-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    table.preview-table th {
+      background: linear-gradient(180deg, #5a67d8 0%, #4c51bf 100%);
+      color: white;
+      padding: 9px 12px;
+      font-weight: 600;
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      border-bottom: 2px solid #3c40c6;
+    }
+
+    table.preview-table th:first-child {
+      border-radius: 0;
+    }
+
+    table.preview-table th:last-child {
+      border-right: none;
+    }
+
+    table.preview-table td {
+      padding: 8px 12px;
+      color: #2d3748;
+      max-width: 130px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.15s ease;
+    }
+
+    /* 交替行颜色 - 清新配色 */
+    table.preview-table tbody tr:nth-child(even) td {
+      background: #f0f4ff;
+    }
+
+    table.preview-table tbody tr:nth-child(odd) td {
+      background: #ffffff;
+    }
+
+    /* 悬停效果 */
+    table.preview-table tbody tr:hover td {
+      background: #dbe4ff !important;
+      transition: background 0.12s ease;
+    }
+
+    /* 行分隔线 */
+    table.preview-table tbody tr:not(:last-child) td {
+      border-bottom: 1px solid #edf2f7;
     }
