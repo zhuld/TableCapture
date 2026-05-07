@@ -203,8 +203,7 @@ function renderPreview(data) {
   });
   html += '</tr></thead><tbody>';
 
-  // 最多显示 20 行
-  //onst displayRows = data.slice(0, 20);
+  //预览全部数据，高度不够用滚动条
   data.forEach(row => {
     html += '<tr>';
     headers.forEach(h => {
@@ -212,13 +211,6 @@ function renderPreview(data) {
     });
     html += '</tr>';
   });
-
-  // if (data.length > 20) {
-  //   html += `<tr><td colspan="${headers.length}" style="text-align:center;color:#888;padding:10px;">
-  //     ... 还有 ${data.length - 20} 行数据未显示 ...
-  //   </td></tr>`;
-  //}
-
   html += '</tbody></table>';
   previewContent.innerHTML = html;
 }

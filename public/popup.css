@@ -6,13 +6,12 @@
 
     body {
       width: 340px;
-      padding: 20px;
+      padding: 15px;
       font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 200px;
     }
 
     .card {
@@ -20,7 +19,7 @@
       background: #ffffffdd;
       backdrop-filter: blur(10px);
       border-radius: 16px;
-      padding: 24px 20px;
+      padding: 20px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       text-align: center;
     }
@@ -182,7 +181,7 @@
 
     .preview-scroll {
       overflow: auto;
-      max-height: 260px;
+      max-height: 230px;
       background: #ffffff;
     }
 
@@ -220,7 +219,7 @@
     }
 
     table.preview-table th {
-      background: linear-gradient(180deg, #5a67d8 0%, #4c51bf 100%);
+      background: #2a7b82;
       color: white;
       padding: 9px 12px;
       font-weight: 600;
@@ -228,7 +227,7 @@
       font-size: 11px;
       letter-spacing: 0.3px;
       border-right: 1px solid rgba(255,255,255,0.15);
-      border-bottom: 2px solid #3c40c6;
+      border-bottom: 2px solid #00a1ae;
     }
 
     table.preview-table th:first-child {
